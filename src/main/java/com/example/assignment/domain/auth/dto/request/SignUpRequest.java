@@ -1,7 +1,9 @@
 package com.example.assignment.domain.auth.dto.request;
 
+import com.example.assignment.domain.user.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,4 +23,8 @@ public class SignUpRequest {
     @NotBlank
     @Schema(description = "닉네임", example = "수빈")
     private String nickname;
+
+    @NotNull
+    @Schema(description = "역할", example = "USER")
+    private UserRole role;
 }
