@@ -54,6 +54,7 @@ public class JwtExceptionHandlerFilter extends OncePerRequestFilter {
             String message
     ) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(exceptionType.getHttpStatus().value());
         response.getWriter().write(objectMapper.writeValueAsString(
                 ErrorResponse.of(exceptionType, message)
