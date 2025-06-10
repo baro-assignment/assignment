@@ -21,6 +21,11 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findById(Long userId) {
+        return users.values().stream().filter(user -> user.getId().equals(userId)).findFirst();
+    }
+
+    @Override
     public User save(User user) {
         Long id = (user.getId() == null) ? idGenerator.getAndIncrement() : user.getId();
         User savedUser = User.builder()
