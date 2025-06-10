@@ -9,6 +9,7 @@ public enum ExceptionType {
     // Auth
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 가입된 사용자입니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."),
+    AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "접근을 위해선 인증이 필요합니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
     // Token
