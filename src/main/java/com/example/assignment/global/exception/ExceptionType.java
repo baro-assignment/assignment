@@ -12,6 +12,9 @@ public enum ExceptionType {
     AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "접근을 위해선 인증이 필요합니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
+    // User
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."),
+
     // Token
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 토큰입니다."),
 
