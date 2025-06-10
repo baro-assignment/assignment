@@ -1,6 +1,8 @@
 package com.example.assignment.domain.auth.controller;
 
+import com.example.assignment.domain.auth.dto.request.LoginRequest;
 import com.example.assignment.domain.auth.dto.request.SignUpRequest;
+import com.example.assignment.domain.auth.dto.response.LoginResponse;
 import com.example.assignment.domain.auth.dto.response.SignUpResponse;
 import com.example.assignment.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -20,5 +22,11 @@ public class AuthController implements AuthControllerSpecification {
     public ResponseEntity<SignUpResponse> signUp(@RequestBody @Valid SignUpRequest request) {
         return ResponseEntity.ok()
                 .body(authService.singUp(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
+        return ResponseEntity.ok()
+                .body(authService.login(loginRequest));
     }
 }
