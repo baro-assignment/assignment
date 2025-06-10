@@ -32,12 +32,12 @@ public class JwtUtil {
     }
 
     /**
-     * JWT 토큰 생성 (Bearer prefix와 함께 반환)
+     * JWT 토큰 생성
      */
     public String createBearerToken(String username, String nickname, UserRole userRole) {
         Date now = new Date();
 
-        return BEARER_PREFIX + Jwts.builder()
+        return Jwts.builder()
                 .setSubject(username)
                 .claim("nickname", nickname)
                 .claim("userRole", userRole)
