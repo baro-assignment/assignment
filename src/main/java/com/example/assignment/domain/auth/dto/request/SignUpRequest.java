@@ -2,10 +2,12 @@ package com.example.assignment.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Schema(description = "회원가입을 위한 사용자 정보 전달")
 @Getter
+@AllArgsConstructor
 public class SignUpRequest {
 
     @NotBlank
