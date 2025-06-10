@@ -11,10 +11,10 @@ import lombok.Getter;
 public class LoginRequest {
 
     @NotBlank
-    @Schema(description = "사용자를 구분하기 위한 이름", example = "SUBIN0620")
+    @Schema(description = "사용자를 구분하기 위한 이름", example = "user1")
     private String username;
 
     @NotBlank
-    @Schema(description = "사용자 인증을 위한 비밀번호", example = "password123")
+    @Schema(description = "사용자 인증을 위한 비밀번호", example = "password")
     private String password;
 }
