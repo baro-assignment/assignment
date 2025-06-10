@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -19,6 +20,7 @@ import java.io.IOException;
  * 인가(권한)이 부족한 사용자가 보호된 리소스에 접근하려 할 때 실행되는 Handler의 구현체입니다.
  * 403 Forbidden 상태 코드와 함께 접근 거부 메시지를 client에 전달합니다.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
@@ -31,6 +33,10 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletResponse response,
             AccessDeniedException accessDeniedException
     ) throws IOException, ServletException {
+        log.warn("[ACCESS_DENIED] URI: {}, 사용자: {}",
+                request.getRequestURI(),
+                request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "ANONYMOUS");
+
         ExceptionType exceptionType = ExceptionType.ACCESS_DENIED;
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");

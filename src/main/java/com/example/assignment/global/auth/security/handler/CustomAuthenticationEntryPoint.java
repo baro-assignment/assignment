@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -19,6 +20,7 @@ import java.io.IOException;
  * 주로 Authorization 헤더가 없어 JWT 인증을 수행하지 않은 경우에 해당합니다.
  * 401 Unauthorized 상태 코드와 함께 인증 필요 메시지를 client에 전달합니다.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -31,6 +33,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
+        log.warn("[AUTHENTICATION_REQUIRED] URI: {}", request.getRequestURI());
+
         ExceptionType exceptionType = ExceptionType.AUTHENTICATION_REQUIRED;
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
