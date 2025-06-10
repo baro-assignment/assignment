@@ -2,6 +2,7 @@ package com.example.assignment.domain.auth.controller;
 
 import com.example.assignment.domain.auth.dto.request.LoginRequest;
 import com.example.assignment.domain.auth.dto.request.SignUpRequest;
+import com.example.assignment.domain.user.enums.UserRole;
 import com.example.assignment.global.auth.jwt.JwtUtil;
 import com.example.assignment.global.auth.security.config.SecurityConfig;
 import com.example.assignment.global.exception.ExceptionType;
@@ -43,7 +44,8 @@ class AuthControllerTest {
         return new SignUpRequest(
                 "username_"+ randomString,
                 "password",
-                "nickname_"+ randomString
+                "nickname_"+ randomString,
+                UserRole.USER
         );
     }
 
@@ -91,7 +93,8 @@ class AuthControllerTest {
                 SignUpRequest signUpRequest = new SignUpRequest(
                         "username1",
                         "password1",
-                        null
+                        null,
+                        UserRole.USER
                 );
 
                 mockMvc.perform(
