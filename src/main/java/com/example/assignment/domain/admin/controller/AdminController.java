@@ -4,10 +4,7 @@ import com.example.assignment.domain.admin.dto.response.GrantAdminRoleResponse;
 import com.example.assignment.domain.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,5 +19,11 @@ public class AdminController implements AdminControllerSpecification{
     ) {
         return ResponseEntity.ok()
                 .body(adminService.grantAdminRoleToUser(userId));
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<String> checkAdminRole() {
+        return ResponseEntity.ok()
+                .body("OK");
     }
 }
