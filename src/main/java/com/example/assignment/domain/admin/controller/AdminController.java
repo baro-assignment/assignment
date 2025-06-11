@@ -29,10 +29,4 @@ public class AdminController implements AdminControllerSpecification{
         return ResponseEntity.ok()
                 .body(adminService.getAllUserProfiles());
     }
-
-    @GetMapping("/check")
-    public ResponseEntity<String> checkAdminRole() {
-        return ResponseEntity.ok()
-                .body("OK");
-    }
 }
