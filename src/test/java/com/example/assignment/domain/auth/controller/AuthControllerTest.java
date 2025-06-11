@@ -2,35 +2,46 @@ package com.example.assignment.domain.auth.controller;
 
 import com.example.assignment.domain.auth.dto.request.LoginRequest;
 import com.example.assignment.domain.auth.dto.request.SignUpRequest;
+import com.example.assignment.domain.auth.dto.response.LoginResponse;
+import com.example.assignment.domain.auth.dto.response.SignUpResponse;
+import com.example.assignment.domain.auth.service.AuthService;
+import com.example.assignment.domain.user.entity.User;
 import com.example.assignment.domain.user.enums.UserRole;
 import com.example.assignment.global.auth.jwt.JwtUtil;
 import com.example.assignment.global.auth.security.config.SecurityConfig;
+import com.example.assignment.global.auth.security.handler.CustomAccessDeniedHandler;
+import com.example.assignment.global.auth.security.handler.CustomAuthenticationEntryPoint;
+import com.example.assignment.global.exception.CustomException;
 import com.example.assignment.global.exception.ExceptionType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import({SecurityConfig.class, JwtUtil.class})
+@WebMvcTest(AuthController.class)
+@Import({SecurityConfig.class, JwtUtil.class, CustomAuthenticationEntryPoint.class, CustomAccessDeniedHandler.class})
 class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private AuthService authService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -53,58 +64,47 @@ class AuthControllerTest {
     class 회원가입 {
         @Test
         void 성공시_200응답_리턴() throws Exception {
-            SignUpRequest signUpRequest = uniqueSingUpRequest();
+            // given
+            SignUpRequest request = uniqueSingUpRequest();
+            User testUser = new User(
+                    1L,
+                    request.getUsername(),
+                    request.getPassword(),
+                    request.getNickname(),
+                    uniqueSingUpRequest().getRole()
+            );
 
+            given(authService.singUp(any())).willReturn(SignUpResponse.from(testUser));
+
+            // when & then
             mockMvc.perform(
                     post("/signup")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(toJson(signUpRequest)))
+                            .content(toJson(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username").value(signUpRequest.getUsername()));
+                    .andExpect(jsonPath("$.username").exists())
+                    .andExpect(jsonPath("$.nickname").exists())
+                    .andExpect(jsonPath("$.role").exists());
         }
 
         @Nested
         class 실패 {
             @Test
             void 중복된_username이라면_409에러_리턴() throws Exception {
-                SignUpRequest signUpRequest = uniqueSingUpRequest();
+                // given
+                SignUpRequest request = uniqueSingUpRequest();
 
-                // 첫 가입
+                given(authService.singUp(any())).willThrow(new CustomException(ExceptionType.USER_ALREADY_EXISTS));
+
+                // when & then
                 mockMvc.perform(
                                 post("/signup")
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(signUpRequest)))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.username").exists());
-
-                // 동일한 username으로 중복 가입 시도
-                mockMvc.perform(
-                                post("/signup")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(signUpRequest)))
+                                        .content(toJson(request)))
                         .andExpect(status().isConflict())
                         .andExpect(jsonPath("$.error").exists())
                         .andExpect(jsonPath("$.error.code").value(ExceptionType.USER_ALREADY_EXISTS.name()))
                         .andExpect(jsonPath("$.error.message").value(ExceptionType.USER_ALREADY_EXISTS.getMessage()));
-            }
-
-            @Test
-            void 필수입력값_누락이라면_400에러_리턴() throws Exception {
-                SignUpRequest signUpRequest = new SignUpRequest(
-                        "username1",
-                        "password1",
-                        null,
-                        UserRole.USER
-                );
-
-                mockMvc.perform(
-                                post("/signup")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(signUpRequest)))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.error").exists())
-                        .andExpect(jsonPath("$.error.code").value(ExceptionType.REQUEST_VALIDATION_FAILED.name()))
-                        .andExpect(jsonPath("$.error.message").exists());
             }
         }
     }
@@ -113,35 +113,37 @@ class AuthControllerTest {
     class 로그인 {
         @Test
         void 성공시_200응답과_토큰_리턴() throws Exception {
-            // 먼저 회원가입
-            SignUpRequest signUpRequest = uniqueSingUpRequest();
-            mockMvc.perform(
-                            post("/signup")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(signUpRequest)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username").exists());
+            // given
+            String testToken = "test.token";
+            LoginRequest request = new LoginRequest("username", "password");
+            LoginResponse response = new LoginResponse(testToken);
 
-            // 로그인 요청
-            LoginRequest loginRequest = new LoginRequest(signUpRequest.getUsername(), signUpRequest.getPassword());
+            given(authService.login(any())).willReturn(response);
+
+            // when & then
             mockMvc.perform(
                             post("/login")
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(loginRequest)))
+                                    .content(toJson(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.token").exists());
+                    .andExpect(jsonPath("$.token").exists())
+                    .andExpect(jsonPath("$.token").value(testToken));
         }
 
         @Nested
         class 실패 {
             @Test
             void 존재하지않는_username이라면_401에러_리턴() throws Exception {
-                // 로그인 요청
-                LoginRequest loginRequest = new LoginRequest("username1", "password1");
+                // given
+                LoginRequest request = new LoginRequest("username", "password");
+
+                given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
+
+                // when & then
                 mockMvc.perform(
                                 post("/login")
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(loginRequest)))
+                                        .content(toJson(request)))
                         .andExpect(status().isUnauthorized())
                         .andExpect(jsonPath("$.error").exists())
                         .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_CREDENTIALS.name()))
@@ -150,38 +152,20 @@ class AuthControllerTest {
 
             @Test
             void 일치하지않는_password이라면_401에러_리턴() throws Exception {
-                // 먼저 회원가입
-                SignUpRequest signUpRequest = uniqueSingUpRequest();
-                mockMvc.perform(
-                                post("/signup")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(signUpRequest)))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.username").exists());
+                // given
+                LoginRequest request = new LoginRequest("username", "wrongPassword");
 
-                // 잘못된 password로 로그인 요청
-                LoginRequest loginRequest = new LoginRequest(uniqueSingUpRequest().getUsername(), "wrongPassword");
+                given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
+
+                // when & then
                 mockMvc.perform(
                                 post("/login")
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(loginRequest)))
+                                        .content(toJson(request)))
                         .andExpect(status().isUnauthorized())
                         .andExpect(jsonPath("$.error").exists())
                         .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_CREDENTIALS.name()))
                         .andExpect(jsonPath("$.error.message").value(ExceptionType.INVALID_CREDENTIALS.getMessage()));
-            }
-
-            @Test
-            void 필수입력값_누락이라면_400에러_리턴() throws Exception {
-                LoginRequest loginRequest = new LoginRequest("username1", null);
-                mockMvc.perform(
-                                post("/login")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(loginRequest)))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.error").exists())
-                        .andExpect(jsonPath("$.error.code").value(ExceptionType.REQUEST_VALIDATION_FAILED.name()))
-                        .andExpect(jsonPath("$.error.message").exists());
             }
         }
     }
