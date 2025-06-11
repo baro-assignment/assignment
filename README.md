@@ -4,13 +4,11 @@
 ## 구현 내용
 ### 1. 기능 구현
 - 회원가입 및 로그인 API 구현
-  - 회원가입 : `POST /signup`
-  - 로그인 : `POST /login`
 - 관리자 전용 API 구현
-  - 관리자 권한 부여 : `PATCH /admin/users/{userId}/grant`
-  - 전체 사용자 프로필 조회 : `GET /admin/users`
+  - 관리자 권한 부여
+  - 전체 사용자 프로필 조회
 - 사용자 전용 API 구현
-  - 본인 프로필 조회 : `GET /users/me`
+  - 본인 프로필 조회
 - [JWT 기반 사용자 인증 모듈 구현](https://github.com/baro-assignment/assignment/pull/8)
 - [Spring Security 인증/인가 실패 처리 모듈 구현](https://github.com/baro-assignment/assignment/pull/12)
 
@@ -28,11 +26,10 @@
 - [JWT 토큰 검증 통합 테스트](https://github.com/baro-assignment/assignment/blob/dev/src/test/java/com/example/assignment/global/auth/JwtIntegrationTest.java)
 
 ## 실행 방법
-### 1. 프로젝트 클론 및 의존성 설치
+### 1. 프로젝트 클론
 ```bash
 git clone https://github.com/baro-assignment/assignment.git
-cd assignment
-./gradlew build
+cd assignment 
 ```
 ### 2. 환경 변수 설정
 `.env` 파일 또는 시스템 환경변수에 `application.yml`에 명세된 값들을 설정하세요.
