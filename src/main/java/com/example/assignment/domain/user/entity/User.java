@@ -1,6 +1,7 @@
 package com.example.assignment.domain.user.entity;
 
 import com.example.assignment.domain.user.enums.UserRole;
+import com.example.assignment.global.dto.AuthInfo;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,6 +21,12 @@ public class User {
         this.password = password;
         this.nickname = nickname;
         this.userRole = userRole;
+    }
+
+    public User(AuthInfo authInfo) {
+        this.username = authInfo.getUsername();
+        this.nickname = authInfo.getNickname();
+        this.userRole = authInfo.getUserRole();
     }
 
     public void setUserRole(UserRole userRole) {
