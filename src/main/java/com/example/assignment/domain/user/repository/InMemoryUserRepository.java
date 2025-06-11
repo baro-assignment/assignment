@@ -3,17 +3,18 @@ package com.example.assignment.domain.user.repository;
 import com.example.assignment.domain.user.entity.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
 
     private final Map<String, User> users = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
-
 
     @Override
     public Optional<User> findByUsername(String username) {
@@ -42,5 +43,10 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public boolean existsByUsername(String username) {
         return users.values().stream().anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public List<User> getAll() {
+        return users.values().stream().toList();
     }
 }
