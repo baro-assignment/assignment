@@ -22,4 +22,9 @@ public interface AuthControllerSpecification {
     description = "사용자 인증 정보를 받아 로그인을 수행합니다.")
     @ApiErrorResponses(value = {ExceptionType.INVALID_CREDENTIALS})
     ResponseEntity<LoginResponse> login(LoginRequest loginRequest);
+
+    @Operation(summary = "인증 확인",
+    description = "인증 확인을 위한 API로, JWT 인증이 되었다면 200 상태코드를 리턴합니다.")
+    @ApiErrorResponses(value = {ExceptionType.AUTHENTICATION_REQUIRED, ExceptionType.INVALID_TOKEN})
+    ResponseEntity<Void> check();
 }

@@ -30,4 +30,9 @@ public class AuthController implements AuthControllerSpecification {
         return ResponseEntity.ok()
                 .body(authService.login(loginRequest));
     }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<Void> check() {
+        return ResponseEntity.ok().build();
+    }
 }
