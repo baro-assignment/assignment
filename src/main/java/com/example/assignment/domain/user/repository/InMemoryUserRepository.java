@@ -49,4 +49,9 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         return users.values().stream().toList();
     }
+
+    @Override
+    public void deleteAll() {
+        users.clear();
+    }
 }
