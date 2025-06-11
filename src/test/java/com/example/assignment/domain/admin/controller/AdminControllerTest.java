@@ -67,7 +67,7 @@ class AdminControllerTest {
             given(adminService.grantAdminRoleToUser(anyLong())).willReturn(response);
 
             // when & then
-            mockMvc.perform(patch("/admin/users/{userId}/roles", targetUserId)
+            mockMvc.perform(patch("/admin/users/{userId}/grant", targetUserId)
                     .with(authentication(adminAuthenticationToken))
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -91,7 +91,7 @@ class AdminControllerTest {
                 given(adminService.grantAdminRoleToUser(anyLong())).willReturn(response);
 
                 // when & then
-                mockMvc.perform(patch("/admin/users/{userId}/roles", targetUserId)
+                mockMvc.perform(patch("/admin/users/{userId}/grant", targetUserId)
                                 .with(authentication(userAuthenticationToken))
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isForbidden())
@@ -109,7 +109,7 @@ class AdminControllerTest {
                 );
 
                 // when & then
-                mockMvc.perform(patch("/admin/users/{userId}/roles", doesntExistUserId)
+                mockMvc.perform(patch("/admin/users/{userId}/grant", doesntExistUserId)
                                 .with(authentication(adminAuthenticationToken))
                                 .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isNotFound())

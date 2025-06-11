@@ -16,7 +16,7 @@ public class AdminController implements AdminControllerSpecification{
 
     private final AdminService adminService;
 
-    @PatchMapping("/users/{userId}/roles")
+    @PatchMapping("/users/{userId}/grant")
     public ResponseEntity<GrantAdminRoleResponse> grantAdminRole(
             @PathVariable Long userId
     ) {
