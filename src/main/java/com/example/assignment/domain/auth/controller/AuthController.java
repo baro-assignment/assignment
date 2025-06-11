@@ -8,6 +8,7 @@ import com.example.assignment.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,5 +29,11 @@ public class AuthController implements AuthControllerSpecification {
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         return ResponseEntity.ok()
                 .body(authService.login(loginRequest));
+    }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<String> check() {
+        return ResponseEntity.ok()
+                .body("OK");
     }
 }
