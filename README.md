@@ -7,7 +7,7 @@
   - 회원가입 : `POST /signup`
   - 로그인 : `POST /login`
 - 관리자 전용 API 구현
-  - 관리자 권한 부여 : `PATCH /admin/users/{userId}/roles`
+  - 관리자 권한 부여 : `PATCH /admin/users/{userId}/grant`
   - 전체 사용자 프로필 조회 : `GET /admin/users`
 - 사용자 전용 API 구현
   - 본인 프로필 조회 : `GET /users/me`
@@ -53,6 +53,6 @@ java -jar build/libs/assignment-0.0.1-SNAPSHOT.jar
 | `/auth/check`                 | GET   | JWT 토큰 유효성 검증      | 인증 필요 |
 | `/users/me`                   | GET   | 내 정보 조회            | 인증 필요 |
 | `/admin/users`                | GET   | 전체 사용자 목록 조회       | 관리자   |
-| `/admin/users/{userId}/roles` | PATCH | 특정 사용자에게 관리자 권한 부여 | 관리자   |
+| `/admin/users/{userId}/grant` | PATCH | 특정 사용자에게 관리자 권한 부여 | 관리자   |
 
 
