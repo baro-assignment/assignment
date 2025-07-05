@@ -61,8 +61,8 @@ public class JwtIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").exists())
-                .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_TOKEN.name()))
-                .andExpect(jsonPath("$.error.message").value("만료된 토큰입니다."));
+                .andExpect(jsonPath("$.error.code").value(ExceptionType.EXPIRED_TOKEN.name()))
+                .andExpect(jsonPath("$.error.message").value(ExceptionType.EXPIRED_TOKEN.getMessage()));
     }
 
     @Test

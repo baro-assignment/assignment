@@ -67,11 +67,14 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new CustomException(ExceptionType.INVALID_TOKEN, "만료된 토큰입니다.");
-        }
-        catch (JwtException | IllegalArgumentException e) {
+        } catch (SecurityException | MalformedJwtException e) {
             throw new CustomException(ExceptionType.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ExceptionType.EXPIRED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new CustomException(ExceptionType.UNSUPPORTED_TOKEN);
+        } catch (Exception e) {
+            throw new CustomException(ExceptionType.INTERNAL_SERVER_ERROR);
         }
     }
 }

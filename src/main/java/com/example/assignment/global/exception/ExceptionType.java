@@ -17,6 +17,8 @@ public enum ExceptionType {
 
     // Token
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 인증 토큰입니다."),
+    UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "지원되지 않는 인증 토큰입니다."),
 
     // Common
     REQUEST_VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "요청 데이터가 유효하지 않습니다."),
