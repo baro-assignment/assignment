@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
@@ -17,8 +16,8 @@ public class InMemoryUserRepository implements UserRepository {
     private final AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return Optional.ofNullable(users.get(username));
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(users.get(email));
     }
 
     @Override
@@ -31,18 +30,18 @@ public class InMemoryUserRepository implements UserRepository {
         Long id = (user.getId() == null) ? idGenerator.getAndIncrement() : user.getId();
         User savedUser = User.builder()
                 .id(id)
-                .username(user.getUsername())
+                .email(user.getEmail())
                 .password(user.getPassword())
                 .nickname(user.getNickname())
                 .userRole(user.getUserRole())
                 .build();
-        users.put(user.getUsername(), savedUser);
+        users.put(user.getEmail(), savedUser);
         return savedUser;
     }
 
     @Override
-    public boolean existsByUsername(String username) {
-        return users.values().stream().anyMatch(user -> user.getUsername().equals(username));
+    public boolean existsByEmail(String email) {
+        return users.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 
     @Override

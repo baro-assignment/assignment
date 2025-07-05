@@ -9,22 +9,22 @@ import lombok.Getter;
 public class User {
 
     private Long id;
-    private String username;
+    private String email;
     private String password;
     private String nickname;
     private UserRole userRole;
 
     @Builder
-    public User(Long id, String username, String password, String nickname, UserRole userRole) {
+    public User(Long id, String email, String password, String nickname, UserRole userRole) {
         this.id = id;
-        this.username = username;
+        this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.userRole = userRole;
     }
 
     public User(AuthInfo authInfo) {
-        this.username = authInfo.getUsername();
+        this.email = authInfo.getEmail();
         this.nickname = authInfo.getNickname();
         this.userRole = authInfo.getUserRole();
     }

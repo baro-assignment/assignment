@@ -9,22 +9,26 @@ import lombok.Getter;
 @Schema(description = "관리자 역할이 부여된 사용자의 정보")
 public class GrantAdminRoleResponse {
 
-    @Schema(description = "사용자를 구분하는 이름")
-    private final String username;
+    @Schema(description = "사용자 id")
+    private Long id;
+    @Schema(description = "사용자 이메일")
+    private final String email;
     @Schema(description = "닉네임")
     private final String nickname;
     @Schema(description = "역할")
     private final UserRole role;
 
-    private GrantAdminRoleResponse(String username, String nickname, UserRole role) {
-        this.username = username;
+    private GrantAdminRoleResponse(Long id, String email, String nickname, UserRole role) {
+        this.id = id;
+        this.email = email;
         this.nickname = nickname;
         this.role = role;
     }
 
     public static GrantAdminRoleResponse from(User user) {
         return new GrantAdminRoleResponse(
-                user.getUsername(),
+                user.getId(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getUserRole()
         );

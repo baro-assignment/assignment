@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +37,7 @@ class AuthIntegrationTest {
     private SignUpRequest uniqueSingUpRequest() {
         String randomString = UUID.randomUUID().toString();
         return new SignUpRequest(
-                "username_"+ randomString,
+                "testUser"+ randomString + "@test.com",
                 "password",
                 "nickname_"+ randomString,
                 UserRole.USER
@@ -56,13 +55,13 @@ class AuthIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(toJson(signUpRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username").value(signUpRequest.getUsername()));
+                    .andExpect(jsonPath("$.email").value(signUpRequest.getEmail()));
         }
 
         @Nested
         class 실패 {
             @Test
-            void 중복된_username이라면_409에러_리턴() throws Exception {
+            void 중복된_email이라면_409에러_리턴() throws Exception {
                 SignUpRequest signUpRequest = uniqueSingUpRequest();
 
                 // 첫 가입
@@ -71,9 +70,9 @@ class AuthIntegrationTest {
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(toJson(signUpRequest)))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.username").exists());
+                        .andExpect(jsonPath("$.email").exists());
 
-                // 동일한 username으로 중복 가입 시도
+                // 동일한 email으로 중복 가입 시도
                 mockMvc.perform(
                                 post("/signup")
                                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +86,7 @@ class AuthIntegrationTest {
             @Test
             void 필수입력값_누락이라면_400에러_리턴() throws Exception {
                 SignUpRequest signUpRequest = new SignUpRequest(
-                        "username1",
+                        "testUser@test.com",
                         "password1",
                         null,
                         UserRole.USER
@@ -116,10 +115,10 @@ class AuthIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(toJson(signUpRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username").exists());
+                    .andExpect(jsonPath("$.email").exists());
 
             // 로그인 요청
-            LoginRequest loginRequest = new LoginRequest(signUpRequest.getUsername(), signUpRequest.getPassword());
+            LoginRequest loginRequest = new LoginRequest(signUpRequest.getEmail(), signUpRequest.getPassword());
             mockMvc.perform(
                             post("/login")
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -131,9 +130,9 @@ class AuthIntegrationTest {
         @Nested
         class 실패 {
             @Test
-            void 존재하지않는_username이라면_401에러_리턴() throws Exception {
+            void 존재하지않는_email이라면_401에러_리턴() throws Exception {
                 // 로그인 요청
-                LoginRequest loginRequest = new LoginRequest("username1", "password1");
+                LoginRequest loginRequest = new LoginRequest("testUser@test.com", "password1");
                 mockMvc.perform(
                                 post("/login")
                                         .contentType(MediaType.APPLICATION_JSON)
@@ -153,10 +152,10 @@ class AuthIntegrationTest {
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .content(toJson(signUpRequest)))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.username").exists());
+                        .andExpect(jsonPath("$.email").exists());
 
                 // 잘못된 password로 로그인 요청
-                LoginRequest loginRequest = new LoginRequest(uniqueSingUpRequest().getUsername(), "wrongPassword");
+                LoginRequest loginRequest = new LoginRequest(uniqueSingUpRequest().getEmail(), "wrongPassword");
                 mockMvc.perform(
                                 post("/login")
                                         .contentType(MediaType.APPLICATION_JSON)
@@ -169,7 +168,7 @@ class AuthIntegrationTest {
 
             @Test
             void 필수입력값_누락이라면_400에러_리턴() throws Exception {
-                LoginRequest loginRequest = new LoginRequest("username1", null);
+                LoginRequest loginRequest = new LoginRequest("testUser@test.com", null);
                 mockMvc.perform(
                                 post("/login")
                                         .contentType(MediaType.APPLICATION_JSON)

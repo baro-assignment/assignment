@@ -28,7 +28,7 @@ public class UserProfileResponse {
     public static UserProfileResponse of(User user) {
         return new UserProfileResponse(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getUserRole()
         );

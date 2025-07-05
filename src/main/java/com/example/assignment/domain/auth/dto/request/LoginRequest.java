@@ -11,8 +11,8 @@ import lombok.Getter;
 public class LoginRequest {
 
     @NotBlank
-    @Schema(description = "사용자를 구분하기 위한 이름", example = "user1")
-    private String username;
+    @Schema(description = "로그인할 이메일", example = "user1@gmail.com")
+    private String email;
 
     @NotBlank
     @Schema(description = "사용자 인증을 위한 비밀번호", example = "password")

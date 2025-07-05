@@ -32,7 +32,7 @@ public class JwtIntegrationTest {
     private String invalidToken = "invalidToken";
 
     private String createdValidToken() {
-        return jwtUtil.createBearerToken("username", "nickname", UserRole.USER);
+        return jwtUtil.createBearerToken(1L,"testUser@gmail.com", "nickname", UserRole.USER);
     }
 
     @Test

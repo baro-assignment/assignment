@@ -16,7 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserProfileResponse getMyProfile(AuthInfo authInfo) {
-        User user = userRepository.findByUsername(authInfo.getUsername())
+        User user = userRepository.findByEmail(authInfo.getEmail())
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_FOUND));
 
         return UserProfileResponse.of(user);

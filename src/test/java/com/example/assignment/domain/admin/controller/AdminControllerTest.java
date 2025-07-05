@@ -46,9 +46,9 @@ class AdminControllerTest {
 
     @BeforeEach
     public void setUp() {
-        AuthInfo userAuthInfo = new AuthInfo("user", "일반 사용자", UserRole.USER);
+        AuthInfo userAuthInfo = new AuthInfo(1L,"user", "일반 사용자", UserRole.USER);
         userAuthenticationToken = new JwtAuthenticationToken(userAuthInfo);
-        AuthInfo adminAuthInfo = new AuthInfo("admin", "관리자", UserRole.ADMIN);
+        AuthInfo adminAuthInfo = new AuthInfo(2L, "admin", "관리자", UserRole.ADMIN);
         adminAuthenticationToken = new JwtAuthenticationToken(adminAuthInfo);
     }
 
@@ -59,7 +59,7 @@ class AdminControllerTest {
             // given
             Long targetUserId = 1L;
             User targetUser = User.builder()
-                    .username("target")
+                    .email("target")
                     .nickname("nickname")
                     .userRole(UserRole.USER)
                     .password("password").build();
@@ -71,7 +71,7 @@ class AdminControllerTest {
                     .with(authentication(adminAuthenticationToken))
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username").exists())
+                    .andExpect(jsonPath("$.email").exists())
                     .andExpect(jsonPath("$.nickname").exists())
                     .andExpect(jsonPath("$.role").exists());
         }
@@ -83,7 +83,7 @@ class AdminControllerTest {
                 // given
                 Long targetUserId = 1L;
                 User targetUser = User.builder()
-                        .username("target")
+                        .email("target")
                         .nickname("nickname")
                         .userRole(UserRole.USER)
                         .password("password").build();

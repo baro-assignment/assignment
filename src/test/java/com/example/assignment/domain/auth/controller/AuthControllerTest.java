@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,7 +52,7 @@ class AuthControllerTest {
     private SignUpRequest uniqueSingUpRequest() {
         String randomString = UUID.randomUUID().toString();
         return new SignUpRequest(
-                "username_"+ randomString,
+                "user@"+ randomString,
                 "password",
                 "nickname_"+ randomString,
                 UserRole.USER
@@ -68,7 +67,7 @@ class AuthControllerTest {
             SignUpRequest request = uniqueSingUpRequest();
             User testUser = new User(
                     1L,
-                    request.getUsername(),
+                    request.getEmail(),
                     request.getPassword(),
                     request.getNickname(),
                     uniqueSingUpRequest().getRole()
@@ -82,7 +81,7 @@ class AuthControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(toJson(request)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username").exists())
+                    .andExpect(jsonPath("$.email").exists())
                     .andExpect(jsonPath("$.nickname").exists())
                     .andExpect(jsonPath("$.role").exists());
         }
@@ -90,7 +89,7 @@ class AuthControllerTest {
         @Nested
         class 실패 {
             @Test
-            void 중복된_username이라면_409에러_리턴() throws Exception {
+            void 중복된_email이라면_409에러_리턴() throws Exception {
                 // given
                 SignUpRequest request = uniqueSingUpRequest();
 
@@ -115,7 +114,7 @@ class AuthControllerTest {
         void 성공시_200응답과_토큰_리턴() throws Exception {
             // given
             String testToken = "test.token";
-            LoginRequest request = new LoginRequest("username", "password");
+            LoginRequest request = new LoginRequest("testUser@gmail.com", "password");
             LoginResponse response = new LoginResponse(testToken);
 
             given(authService.login(any())).willReturn(response);
@@ -133,9 +132,9 @@ class AuthControllerTest {
         @Nested
         class 실패 {
             @Test
-            void 존재하지않는_username이라면_401에러_리턴() throws Exception {
+            void 존재하지않는_email이라면_401에러_리턴() throws Exception {
                 // given
-                LoginRequest request = new LoginRequest("username", "password");
+                LoginRequest request = new LoginRequest("testUser@gmail.com", "password");
 
                 given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
 
@@ -153,7 +152,7 @@ class AuthControllerTest {
             @Test
             void 일치하지않는_password이라면_401에러_리턴() throws Exception {
                 // given
-                LoginRequest request = new LoginRequest("username", "wrongPassword");
+                LoginRequest request = new LoginRequest("testUser@gmail.com", "wrongPassword");
 
                 given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
 

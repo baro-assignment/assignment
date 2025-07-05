@@ -9,22 +9,22 @@ import lombok.Getter;
 @Schema(description = "회원가입된 사용자의 정보")
 public class SignUpResponse {
 
-    @Schema(description = "사용자를 구분하는 이름")
-    private final String username;
+    @Schema(description = "회원가입 된 이메일")
+    private final String email;
     @Schema(description = "닉네임")
     private final String nickname;
     @Schema(description = "역할")
     private final UserRole role;
 
-    private SignUpResponse(String username, String nickname, UserRole role) {
-        this.username = username;
+    private SignUpResponse(String email, String nickname, UserRole role) {
+        this.email = email;
         this.nickname = nickname;
         this.role = role;
     }
 
     public static SignUpResponse from(User user) {
         return new SignUpResponse(
-                user.getUsername(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getUserRole()
         );

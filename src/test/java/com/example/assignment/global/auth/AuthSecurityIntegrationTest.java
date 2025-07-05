@@ -35,8 +35,8 @@ public class AuthSecurityIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User user = new User(1L, "user", "password", "일반 사용자", UserRole.USER);
-    private User adminUser = new User(2L, "admin", "password", "관리자", UserRole.ADMIN);
+    private User user = new User(1L, "user@test.com", "password", "일반 사용자", UserRole.USER);
+    private User adminUser = new User(2L, "admin@test.com", "password", "관리자", UserRole.ADMIN);
     private String userToken;
     private String adminToken;
 
@@ -47,8 +47,8 @@ public class AuthSecurityIntegrationTest {
         userRepository.save(user);
         userRepository.save(adminUser);
 
-        userToken = jwtUtil.createBearerToken(user.getUsername(), user.getNickname(), user.getUserRole());
-        adminToken = jwtUtil.createBearerToken(adminUser.getUsername(), adminUser.getNickname(), adminUser.getUserRole());
+        userToken = jwtUtil.createBearerToken(user.getId(), user.getEmail(), user.getNickname(), user.getUserRole());
+        adminToken = jwtUtil.createBearerToken(user.getId(), adminUser.getEmail(), adminUser.getNickname(), adminUser.getUserRole());
     }
 
     @Test

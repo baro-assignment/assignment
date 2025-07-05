@@ -5,7 +5,6 @@ import com.example.assignment.domain.auth.dto.request.SignUpRequest;
 import com.example.assignment.domain.auth.dto.response.LoginResponse;
 import com.example.assignment.domain.auth.dto.response.SignUpResponse;
 import com.example.assignment.domain.user.entity.User;
-import com.example.assignment.domain.user.enums.UserRole;
 import com.example.assignment.domain.user.repository.UserRepository;
 import com.example.assignment.global.auth.jwt.JwtUtil;
 import com.example.assignment.global.exception.CustomException;
@@ -23,12 +22,12 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public SignUpResponse singUp(SignUpRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(ExceptionType.USER_ALREADY_EXISTS);
         }
 
         User user = User.builder()
-                .username(request.getUsername())
+                .email(request.getEmail())
                 .nickname(request.getNickname())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .userRole(request.getRole())
@@ -39,14 +38,14 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(ExceptionType.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomException(ExceptionType.INVALID_CREDENTIALS);
         }
 
-        String token = jwtUtil.createBearerToken(user.getUsername(), user.getNickname(), user.getUserRole());
+        String token = jwtUtil.createBearerToken(user.getId(), user.getEmail(), user.getNickname(), user.getUserRole());
         return new LoginResponse(token);
     }
 }

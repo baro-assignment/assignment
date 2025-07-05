@@ -34,11 +34,12 @@ public class JwtUtil {
     /**
      * JWT 토큰 생성
      */
-    public String createBearerToken(String username, String nickname, UserRole userRole) {
+    public String createBearerToken(Long userId, String email, String nickname, UserRole userRole) {
         Date now = new Date();
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(String.valueOf(userId))
+                .claim("email", email)
                 .claim("nickname", nickname)
                 .claim("userRole", userRole)
                 .setExpiration(new Date(now.getTime() + TOKEN_TIME))
