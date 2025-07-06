@@ -14,10 +14,12 @@
 
 ## 2. Swagger 문서화
 > [배포 서버 Swagger 문서](http://13.125.250.27:8080/swagger-ui/index.html)
+
 위 링크를 클릭하여 배포된 서버의 Swagger 문서에 접속 가능합니다.
 
 ### 인증 헤더 설정 방법
-<img width="1000" alt="Screenshot 2025-07-06 at 16 34 08" src="https://github.com/user-attachments/assets/ae19062c-5030-4ba9-91c4-a23194b437fc" />
+<img width="1000" alt="Screenshot 2025-07-06 at 16 50 39" src="https://github.com/user-attachments/assets/e996206f-c3c2-45b0-b609-eef892e54f53" />
+
 
 1. `사용자 회원가입` 혹은 `관리자 회원가입` API 중 하나를 실행해 회원가입을 진행합니다.
 
@@ -27,7 +29,8 @@
 
 3. `Authorize` 버튼을 클릭한 후, token 값을 그대로 입력합니다. Bearer prefix는 자동으로 추가되므로, 임의로 추가하지 않아야 합니다.
 
-<img width="1000" alt="Screenshot 2025-07-06 at 16 39 02" src="https://github.com/user-attachments/assets/13987c26-60fe-4d8d-904f-578e9c88729e" />
+<img width="1000" alt="Screenshot 2025-07-06 at 16 50 51" src="https://github.com/user-attachments/assets/eda859fd-6877-463e-bdf3-532fe0fa3baf" />
+
 
 ### 로컬 실행 시
 프로젝트를 로컬에서 실행한 경우, `/swagger` 경로로 Swagger UI에 접속 가능합니다.
