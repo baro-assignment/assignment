@@ -24,6 +24,7 @@ public class User {
     }
 
     public User(AuthInfo authInfo) {
+        this.id = authInfo.getId();
         this.email = authInfo.getEmail();
         this.nickname = authInfo.getNickname();
         this.userRole = authInfo.getUserRole();

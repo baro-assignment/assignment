@@ -9,17 +9,31 @@ import com.example.assignment.global.auth.security.handler.CustomAccessDeniedHan
 import com.example.assignment.global.auth.security.handler.CustomAuthenticationEntryPoint;
 import com.example.assignment.global.exception.ExceptionType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+/**
+ * Spring Security 환경에서 인증(Authentication) 및 권한(Authorization) 제어가
+ * 올바르게 동작하는지 통합적으로 검증하는 테스트 클래스.
+ *
+ * 주요 검증 내용 :
+ * 1. 인증 없이 접근 (Anonymous)
+ * 2. 사용자 권한으로 접근 (WithUserToken)
+ * 3. 관리자 권한으로 접근 (WithAdminToken)
+ *
+ */
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,36 +65,74 @@ public class AuthSecurityIntegrationTest {
         adminToken = jwtUtil.createBearerToken(user.getId(), adminUser.getEmail(), adminUser.getNickname(), adminUser.getUserRole());
     }
 
-    @Test
-    void 인증없이_일반API에_접근시_401에러_리턴() throws Exception {
-        mockMvc.perform(get("/users/me"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").exists())
-                .andExpect(jsonPath("$.error.code").value(ExceptionType.AUTHENTICATION_REQUIRED.name()))
-                .andExpect(jsonPath("$.error.message").value(ExceptionType.AUTHENTICATION_REQUIRED.getMessage()));
-    }
+    @Nested
+    @DisplayName("인증 없이 접근")
+    class Anonymous {
 
-    @Test
-    void 인증없이_관리자API에_접근시_401에러_리턴() throws Exception {
-        mockMvc.perform(get("/admin/users"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").exists())
-                .andExpect(jsonPath("$.error.code").value(ExceptionType.AUTHENTICATION_REQUIRED.name()))
-                .andExpect(jsonPath("$.error.message").value(ExceptionType.AUTHENTICATION_REQUIRED.getMessage()));
+        @Test
+        @DisplayName("인증 없이 인증이 필요한 API에 접근 시 401 에러를 전달한다.")
+        void 인증없이_일반API에_접근시_401에러_리턴() throws Exception {
+            mockMvc.perform(get("/users/me"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.error").exists())
+                    .andExpect(jsonPath("$.error.code").value(ExceptionType.AUTHENTICATION_REQUIRED.name()))
+                    .andExpect(jsonPath("$.error.message").value(ExceptionType.AUTHENTICATION_REQUIRED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("인증 없이 관리자 권한이 필요한 API에 접근 시 401 에러를 전달한다.")
+        void 인증없이_관리자API에_접근시_401에러_리턴() throws Exception {
+            mockMvc.perform(get("/admin/users"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.error").exists())
+                    .andExpect(jsonPath("$.error.code").value(ExceptionType.AUTHENTICATION_REQUIRED.name()))
+                    .andExpect(jsonPath("$.error.message").value(ExceptionType.AUTHENTICATION_REQUIRED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("인증 없이 회원가입, 로그인 API에 접근할 수 있다.")
+        void signUpLogin() throws Exception {
+            mockMvc.perform(post("/signup/user")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                            {
+                                "email": "test@test.com",
+                                "password": "password123",
+                                "nickname": "test"
+                            }
+                        """))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.email").value("test@test.com"));
+
+            mockMvc.perform(post("/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                            {
+                                "email": "test@test.com",
+                                "password": "password123"
+                            }
+                        """))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.token").exists());
+        }
     }
 
 
     @Nested
-    class 일반사용자 {
+    @DisplayName("사용자 권한으로 접근")
+    class WithUserToken {
+
         @Test
-        void 일반API에_접근시_200응답_리턴() throws Exception {
+        @DisplayName("사용자는 일반 API에 접근할 수 있다.")
+        void api() throws Exception {
             mockMvc.perform(get("/users/me")
                             .header("Authorization", "Bearer " + userToken))
                     .andExpect(status().isOk());
         }
 
         @Test
-        void 관리자API에_접근시_403에러_리턴() throws Exception {
+        @DisplayName("사용자가 관리자 API에 접근 시 403 에러를 전달한다.")
+        void adminApi() throws Exception {
             mockMvc.perform(get("/admin/users")
                             .header("Authorization", "Bearer " + userToken))
                     .andExpect(status().isForbidden())
@@ -91,15 +143,19 @@ public class AuthSecurityIntegrationTest {
     }
 
     @Nested
-    class 관리자 {
+    @DisplayName("관리자 권한으로 접근")
+    class WithAdminToken {
+
         @Test
-        void 일반API에_접근시_200응답_리턴() throws Exception {
+        @DisplayName("관리자는 일반 API에 접근할 수 있다.")
+        void api() throws Exception {
             mockMvc.perform(get("/users/me")
                             .header("Authorization", "Bearer " + adminToken))
                     .andExpect(status().isOk());
         }
 
         @Test
+        @DisplayName("관리자는 관리자 API에 접근할 수 있다.")
         void 관리자API에_접근시_200응답_리턴() throws Exception {
             mockMvc.perform(get("/admin/users")
                             .header("Authorization", "Bearer " + adminToken))

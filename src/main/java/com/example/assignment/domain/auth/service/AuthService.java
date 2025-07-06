@@ -5,6 +5,7 @@ import com.example.assignment.domain.auth.dto.request.SignUpRequest;
 import com.example.assignment.domain.auth.dto.response.LoginResponse;
 import com.example.assignment.domain.auth.dto.response.SignUpResponse;
 import com.example.assignment.domain.user.entity.User;
+import com.example.assignment.domain.user.enums.UserRole;
 import com.example.assignment.domain.user.repository.UserRepository;
 import com.example.assignment.global.auth.jwt.JwtUtil;
 import com.example.assignment.global.exception.CustomException;
@@ -21,7 +22,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public SignUpResponse singUp(SignUpRequest request) {
+    public SignUpResponse signUpUser(SignUpRequest request) {
+        return signUp(request, UserRole.USER);
+    }
+
+    public SignUpResponse signUpAdmin(SignUpRequest request) {
+        return signUp(request, UserRole.ADMIN);
+    }
+
+    private SignUpResponse signUp(SignUpRequest request, UserRole userRole) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(ExceptionType.USER_ALREADY_EXISTS);
         }
@@ -30,7 +39,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .nickname(request.getNickname())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .userRole(request.getRole())
+                .userRole(userRole)
                 .build();
 
         User savedUser = userRepository.save(user);

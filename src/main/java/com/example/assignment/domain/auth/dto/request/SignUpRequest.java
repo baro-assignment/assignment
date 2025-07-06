@@ -15,7 +15,7 @@ public class SignUpRequest {
 
     @Email
     @NotBlank
-    @Schema(description = "회원가입을 진행할 이메일, 중복된 이메일로 회원가입할 수 없습니다.", example = "user1@gamil.com")
+    @Schema(description = "회원가입을 진행할 이메일, 중복된 이메일로 회원가입할 수 없습니다.", example = "test@gmail.com")
     private String email;
 
     @NotBlank
@@ -23,10 +23,6 @@ public class SignUpRequest {
     private String password;
 
     @NotBlank
-    @Schema(description = "닉네임", example = "사용자")
+    @Schema(description = "닉네임", example = "닉네임")
     private String nickname;
-
-    @NotNull
-    @Schema(description = "역할", example = "USER")
-    private UserRole role;
 }

@@ -15,6 +15,7 @@ import com.example.assignment.global.exception.CustomException;
 import com.example.assignment.global.exception.ExceptionType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -49,72 +49,121 @@ class AuthControllerTest {
         return objectMapper.writeValueAsString(object);
     }
 
-    private SignUpRequest uniqueSingUpRequest() {
-        String randomString = UUID.randomUUID().toString();
-        return new SignUpRequest(
-                "user@"+ randomString,
-                "password",
-                "nickname_"+ randomString,
-                UserRole.USER
-        );
-    }
-
     @Nested
-    class 회원가입 {
+    @DisplayName("사용자로 회원가입을 할 수 있다.")
+    class SignUpUser {
+
+        SignUpRequest userRequest = new SignUpRequest(
+                "user@test.com",
+                "password",
+                "nickname"
+        );
+
         @Test
-        void 성공시_200응답_리턴() throws Exception {
+        @DisplayName("회원가입에 성공한다.")
+        void signUp() throws Exception {
             // given
-            SignUpRequest request = uniqueSingUpRequest();
             User testUser = new User(
                     1L,
-                    request.getEmail(),
-                    request.getPassword(),
-                    request.getNickname(),
-                    uniqueSingUpRequest().getRole()
+                    userRequest.getEmail(),
+                    userRequest.getPassword(),
+                    userRequest.getNickname(),
+                    UserRole.USER
             );
-
-            given(authService.singUp(any())).willReturn(SignUpResponse.from(testUser));
+            given(authService.signUpUser(any())).willReturn(SignUpResponse.from(testUser));
 
             // when & then
             mockMvc.perform(
-                    post("/signup")
+                    post("/signup/user")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(toJson(request)))
+                            .content(toJson(userRequest)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.email").exists())
                     .andExpect(jsonPath("$.nickname").exists())
                     .andExpect(jsonPath("$.role").exists());
         }
 
-        @Nested
-        class 실패 {
-            @Test
-            void 중복된_email이라면_409에러_리턴() throws Exception {
-                // given
-                SignUpRequest request = uniqueSingUpRequest();
+        @Test
+        @DisplayName("중복된 이메일로 회원가입 요청 시 예외가 발생한다.")
+        void duplicated_email() throws Exception {
+            // given
+            given(authService.signUpUser(any())).willThrow(new CustomException(ExceptionType.USER_ALREADY_EXISTS));
 
-                given(authService.singUp(any())).willThrow(new CustomException(ExceptionType.USER_ALREADY_EXISTS));
-
-                // when & then
-                mockMvc.perform(
-                                post("/signup")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(request)))
-                        .andExpect(status().isConflict())
-                        .andExpect(jsonPath("$.error").exists())
-                        .andExpect(jsonPath("$.error.code").value(ExceptionType.USER_ALREADY_EXISTS.name()))
-                        .andExpect(jsonPath("$.error.message").value(ExceptionType.USER_ALREADY_EXISTS.getMessage()));
-            }
+            // when & then
+            mockMvc.perform(
+                            post("/signup/user")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(userRequest)))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.error").exists())
+                    .andExpect(jsonPath("$.error.code").value(ExceptionType.USER_ALREADY_EXISTS.name()))
+                    .andExpect(jsonPath("$.error.message").value(ExceptionType.USER_ALREADY_EXISTS.getMessage()));
         }
     }
 
     @Nested
-    class 로그인 {
+    @DisplayName("관리자로 회원가입을 할 수 있다.")
+    class SignUpAdmin {
+
+        SignUpRequest adminRequest = new SignUpRequest(
+                "admin@test.com",
+                "password",
+                "nickname"
+        );
+
         @Test
-        void 성공시_200응답과_토큰_리턴() throws Exception {
+        @DisplayName("회원가입에 성공한다.")
+        void signUp() throws Exception {
+            // given
+            User testUser = new User(
+                    1L,
+                    adminRequest.getEmail(),
+                    adminRequest.getPassword(),
+                    adminRequest.getNickname(),
+                    UserRole.ADMIN
+            );
+            given(authService.signUpAdmin(any())).willReturn(SignUpResponse.from(testUser));
+
+            // when & then
+            mockMvc.perform(
+                            post("/signup/admin")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(adminRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.email").exists())
+                    .andExpect(jsonPath("$.nickname").exists())
+                    .andExpect(jsonPath("$.role").exists());
+        }
+
+        @Test
+        @DisplayName("중복된 이메일로 회원가입 요청 시 예외가 발생한다.")
+        void duplicated_email() throws Exception {
+            // given
+            given(authService.signUpAdmin(any())).willThrow(new CustomException(ExceptionType.USER_ALREADY_EXISTS));
+
+            // when & then
+            mockMvc.perform(
+                            post("/signup/admin")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(adminRequest)))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.error").exists())
+                    .andExpect(jsonPath("$.error.code").value(ExceptionType.USER_ALREADY_EXISTS.name()))
+                    .andExpect(jsonPath("$.error.message").value(ExceptionType.USER_ALREADY_EXISTS.getMessage()));
+        }
+    }
+
+    @Nested
+    @DisplayName("로그인을 할 수 있다.")
+    class LogIn {
+
+        LoginRequest request = new LoginRequest("testUser@gmail.com", "password");
+
+        @Test
+        @DisplayName("로그인에 성공하여 token을 반환한다.")
+        void login() throws Exception {
             // given
             String testToken = "test.token";
-            LoginRequest request = new LoginRequest("testUser@gmail.com", "password");
             LoginResponse response = new LoginResponse(testToken);
 
             given(authService.login(any())).willReturn(response);
@@ -129,43 +178,38 @@ class AuthControllerTest {
                     .andExpect(jsonPath("$.token").value(testToken));
         }
 
-        @Nested
-        class 실패 {
-            @Test
-            void 존재하지않는_email이라면_401에러_리턴() throws Exception {
-                // given
-                LoginRequest request = new LoginRequest("testUser@gmail.com", "password");
+        @Test
+        @DisplayName("존재하지 않는 email로 로그인 시도 시 예외가 발생한다.")
+        void invalidCredentialsEmail() throws Exception {
+            // given
+            given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
 
-                given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
+            // when & then
+            mockMvc.perform(
+                            post("/login")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(request)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.error").exists())
+                    .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_CREDENTIALS.name()))
+                    .andExpect(jsonPath("$.error.message").value(ExceptionType.INVALID_CREDENTIALS.getMessage()));
+        }
 
-                // when & then
-                mockMvc.perform(
-                                post("/login")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(request)))
-                        .andExpect(status().isUnauthorized())
-                        .andExpect(jsonPath("$.error").exists())
-                        .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_CREDENTIALS.name()))
-                        .andExpect(jsonPath("$.error.message").value(ExceptionType.INVALID_CREDENTIALS.getMessage()));
-            }
+        @Test
+        @DisplayName("일치하지 않는 password로 로그인 시도 시 예외가 발생한다.")
+        void invalidCredentialsPassword() throws Exception {
+            // given
+            given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
 
-            @Test
-            void 일치하지않는_password이라면_401에러_리턴() throws Exception {
-                // given
-                LoginRequest request = new LoginRequest("testUser@gmail.com", "wrongPassword");
-
-                given(authService.login(any())).willThrow(new CustomException(ExceptionType.INVALID_CREDENTIALS));
-
-                // when & then
-                mockMvc.perform(
-                                post("/login")
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(toJson(request)))
-                        .andExpect(status().isUnauthorized())
-                        .andExpect(jsonPath("$.error").exists())
-                        .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_CREDENTIALS.name()))
-                        .andExpect(jsonPath("$.error.message").value(ExceptionType.INVALID_CREDENTIALS.getMessage()));
-            }
+            // when & then
+            mockMvc.perform(
+                            post("/login")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(request)))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.error").exists())
+                    .andExpect(jsonPath("$.error.code").value(ExceptionType.INVALID_CREDENTIALS.name()))
+                    .andExpect(jsonPath("$.error.message").value(ExceptionType.INVALID_CREDENTIALS.getMessage()));
         }
     }
 }

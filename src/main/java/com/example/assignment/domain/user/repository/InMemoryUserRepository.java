@@ -41,7 +41,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public boolean existsByEmail(String email) {
-        return users.values().stream().anyMatch(user -> user.getEmail().equals(email));
+        return users.containsKey(email);
     }
 
     @Override

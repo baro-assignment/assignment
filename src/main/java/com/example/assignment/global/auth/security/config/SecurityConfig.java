@@ -52,7 +52,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/signup", "/login").permitAll()
+                        .requestMatchers("/signup/**", "/login").permitAll()
                         .requestMatchers("/admin/**").hasAuthority(UserRole.ADMIN.toRoleName())
                         .anyRequest().authenticated()
                 )

@@ -11,7 +11,7 @@ import lombok.Getter;
 public class LoginRequest {
 
     @NotBlank
-    @Schema(description = "로그인할 이메일", example = "user1@gmail.com")
+    @Schema(description = "로그인할 이메일", example = "test@gmail.com")
     private String email;
 
     @NotBlank

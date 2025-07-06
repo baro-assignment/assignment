@@ -19,10 +19,16 @@ public class AuthController implements AuthControllerSpecification {
 
     private final AuthService authService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> signUp(@RequestBody @Valid SignUpRequest request) {
+    @PostMapping("/signup/user")
+    public ResponseEntity<SignUpResponse> signUpUser(@RequestBody @Valid SignUpRequest request) {
         return ResponseEntity.ok()
-                .body(authService.singUp(request));
+                .body(authService.signUpUser(request));
+    }
+
+    @PostMapping("/signup/admin")
+    public ResponseEntity<SignUpResponse> signUpAdmin(@RequestBody @Valid SignUpRequest request) {
+        return ResponseEntity.ok()
+                .body(authService.signUpAdmin(request));
     }
 
     @PostMapping("/login")

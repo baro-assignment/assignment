@@ -13,10 +13,15 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "Authorization", description = "인증 관련 API")
 public interface AuthControllerSpecification {
 
-    @Operation(summary = "회원가입",
-    description = "사용자 정보를 받아 회원가입을 수행합니다.")
+    @Operation(summary = "사용자 회원가입",
+    description = "사용자 정보를 받아 일반 사용자 회원가입을 수행합니다.")
     @ApiErrorResponses(value = {ExceptionType.USER_ALREADY_EXISTS})
-    ResponseEntity<SignUpResponse> signUp(SignUpRequest signUpRequest);
+    ResponseEntity<SignUpResponse> signUpUser(SignUpRequest signUpRequest);
+
+    @Operation(summary = "관리자 회원가입",
+            description = "사용자 정보를 받아 관리자 회원가입을 수행합니다.")
+    @ApiErrorResponses(value = {ExceptionType.USER_ALREADY_EXISTS})
+    ResponseEntity<SignUpResponse> signUpAdmin(SignUpRequest signUpRequest);
 
     @Operation(summary = "로그인",
     description = "사용자 인증 정보를 받아 로그인을 수행합니다.")
