@@ -13,7 +13,7 @@
 - [Spring Security 인증/인가 실패 처리 모듈 구현](https://github.com/baro-assignment/assignment/pull/12)
 
 ## 2. Swagger 문서화
-> [배포 서버 Swagger 문서](http://43.200.182.80:8080/swagger-ui/index.html)
+> [배포 서버 Swagger 문서](http://13.125.250.27:8080/swagger-ui/index.html)
 위 링크를 클릭하여 배포된 서버의 Swagger 문서에 접속 가능합니다.
 
 ### 인증 헤더 설정 방법
@@ -57,7 +57,7 @@ java -jar build/libs/assignment-0.0.1-SNAPSHOT.jar
 ```
 
 # API 명세 요약
-> 자세한 요청/응답 형식은 [Swagger 문서](http://43.200.182.80:8080/swagger-ui/index.html)
+> 자세한 요청/응답 형식은 [Swagger 문서](http://13.125.250.27:8080/swagger-ui/index.html)
 
 | 경로 (Path)                     | 메서드   | 설명                 | 권한    |
 | ----------------------------- | ----- | ------------------ | ----- |
